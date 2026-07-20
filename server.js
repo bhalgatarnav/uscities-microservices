@@ -9,7 +9,7 @@ const { MongoClient } = require('mongodb');
 app.use(express.urlencoded({ extended: false }))
 const cors = require('cors')//New for microservice
 app.use(cors())//New for microservice
-const uri = "mongodb+srv://bhalgatarnav:<password>@messengerdb.ekejfsq.mongodb.net/?appName=MessengerDB"; //replace this with your connection string
+const uri = "mongodb+srv://bhalgatarnav:SEbhalgaaa1234@messengerdb.ekejfsq.mongodb.net/?appName=MessengerDB"; //replace this with your connection string
 const mongoclient = new MongoClient(uri);
 async function mongoconnect() {
   await mongoclient.connect();
@@ -26,6 +26,44 @@ const PORT = process.env.PORT || 8080;
     process.exit(1); // fail fast — don't run a server that can't authenticate anyone
   }
 })();
+
+let uscities = mongoclient.db('uscities-microservices').collection('uscities');
+// 'uscities-microservices' = database name, 'uscities' = collection name imported earlier
+
+const fields = {
+  _id: 0,
+  city: 1,
+  state_id: 1,
+  state_name: 1,
+  county_name: 1,
+  timezone: 1,
+  zips: 1
+};
+
+app.get(/^\/uscities-search\/(\d{1,5})$/, async (req, res) => {
+  const zipCode = req.params[0];
+  console.log(`Debug> zipCode= ${zipCode}`);
+  try {
+    const zipRegEx = new RegExp(zipCode);
+    const results = await uscities.find({ zips: zipRegEx }).project(fields).toArray();
+    res.json(results);
+  } catch (error) {
+    console.error('ZIP search error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.get('/uscities-search/:city', async (req, res) => {
+  console.log(`Debug: /uscities-search -> city= ${req.params.city}`);
+  try {
+    const cityRegEx = new RegExp(req.params.city, 'i'); // 'i' = case-insensitive
+    const results = await uscities.find({ city: cityRegEx }).project(fields).toArray();
+    res.json(results);
+  } catch (error) {
+    console.error('City search error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 app.get('/', (req, res) => {
   res.send('USCities-Microservices Gateway by ARNAV BHALGAT');
 })
