@@ -9,7 +9,7 @@ const { MongoClient } = require('mongodb');
 app.use(express.urlencoded({ extended: false }))
 const cors = require('cors')//New for microservice
 app.use(cors())//New for microservice
-const uri = "mongodb+srv://bhalgatarnav:SEbhalgaaa1234@messengerdb.ekejfsq.mongodb.net/?appName=MessengerDB"; //replace this with your connection string
+const uri = "mongodb+srv://bhalgatarnav:<password>@messengerdb.ekejfsq.mongodb.net/?appName=MessengerDB"; //replace this with your connection string
 const mongoclient = new MongoClient(uri);
 async function mongoconnect() {
   await mongoclient.connect();
